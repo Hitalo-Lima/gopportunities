@@ -3,7 +3,7 @@ package router
 import "github.com/gin-gonic/gin"
 
 func Initialize() {
-	// initialize router
+	// initialize default gin router
 	router := gin.Default()
 
 	// initialize routes
