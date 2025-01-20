@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useQuery } from 'react-query'
 
 type Openings = {
   ID: number
@@ -6,28 +7,25 @@ type Openings = {
   Salary: number
 }
 
-function App() {
-  const [openings, setOpenings] = useState<Openings[]>([])
+const api = axios.create({
+  baseURL: 'http://localhost:8080/api/v1/',
+})
 
-  useEffect(() => {
-    fetch('http://localhost:8080/api/v1/openings')
-      .then(response => response.json())
-      .then(data => {
-        setOpenings(data.data) 
-        console.log(data.data)  
-      })
-      .catch(error => {
-        console.error("Erro ao buscar dados:", error)
-      })
-  }, [])  
+function App() {
+  const { data, isFetching } = useQuery<Openings[]>('openings', async () => {
+    const response = await api.get('openings')
+
+    return response.data.data
+  })
 
   return (
     <ul>
-      {openings.map(opening => {
+      {isFetching && <p>Carregando...</p>}
+      {data?.map(opening => {
         return (
           <li key={opening.ID}>
-            <strong>{opening.Role}</strong>
-            <p>{opening.Salary}</p>
+            <strong>#{opening.ID} {opening.Role}</strong>
+            <p>Salary: {opening.Salary}</p>
           </li>
         )
       })}
